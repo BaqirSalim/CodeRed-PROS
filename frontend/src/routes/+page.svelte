@@ -1,8 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
+
     import "../../node_modules/mapbox-gl/dist/mapbox-gl.css"
 
     import mapboxgl from 'mapbox-gl';
+
+    import { createEventDispatcher } from 'svelte';
+    
     const { Map } = mapboxgl;
 
     let map: any;
@@ -41,6 +45,20 @@
 	});
 
 
+    const dispatch = createEventDispatcher();
+
+
+    let isModalOpen = false;
+
+    function handleClick() {
+    isModalOpen = true;
+        dispatch('toggleModal');
+    }
+
+    function closeModal() {
+        isModalOpen = false;
+    }
+    
     // MESSAGE STUFF BELOW ----------------------------------------
     
     let message = ""
@@ -62,12 +80,14 @@
     }
 
     async function fetchData(message: string) {
+
+        // let response = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        // conversation = [...conversation, {role : "agent", message : response}];
+
         try {
             let data = {}
             const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
             const responseData = await response.json(); // Assuming the response is in JSON format
-
-            //removeLoadingMessage(); // Remove loading message
             
             conversation = [...conversation, {role : "agent", message : responseData.naturalResponse}];
             console.log(responseData);
@@ -75,30 +95,6 @@
             console.error('Error fetching data:', error);
         }
     }
-
-
-    
-   /* function displayLoadingMessage() {
-        const loadingMessage = document.createElement('div');
-        loadingMessage.textContent = 'Loading...';
-        loadingMessage.classList.add('loading-message');
-        const chatbox = document.querySelector('.conversation');
-        if (chatbox) {
-            chatbox.appendChild(loadingMessage);
-        } else {
-            console.error('.conversation element not found');
-        }
-    }
-
-    function removeLoadingMessage() {
-        const loadingMessage = document.querySelector('.loading-message');
-        if (loadingMessage) {
-            loadingMessage.remove();
-        }
-    }
-*/
-    
-
 
 </script>
 
@@ -109,7 +105,7 @@
     }
     
     .navbar{
-        @apply w-full bg-neutral-700;
+        @apply w-full bg-neutral-700 h-[75px];
     }
     .navbar-wrapper{
         @apply flex flex-row justify-between w-11/12 mx-auto h-full;
@@ -133,7 +129,14 @@
     }
     
     .chat-box {
-        @apply max-h-full border border-white rounded-2xl p-8 overflow-y-scroll;
+        @apply max-h-[655px] border border-white rounded-2xl p-8 overflow-y-scroll;
+    }
+    .chat-box::-webkit-scrollbar{
+        @apply w-3 ;
+    }
+    .chat-box::-webkit-scrollbar{
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+        border-radius: 10px;
     }
 
     .message.from-bot {
@@ -142,13 +145,13 @@
 
     
     .message.from-user {
-        @apply rounded-br-none bg-gray-700 text-white px-4 py-3 rounded-xl max-w-md relative ;
+        @apply rounded-br-none bg-gray-700 text-white px-4 py-3 rounded-xl max-w-md relative self-end;
     }
 
     .message-wrapper{
         @apply flex mb-8;
     }
-    .message-wrapper:nth-child(n){
+    .message-wrapper:nth-child(2n){
         @apply justify-end;
     }
 
@@ -210,8 +213,15 @@
             <a href="/" class="nav-link">FlightChat</a>
             <div class="helpbtn">
                 <!-- Make the help button here -->
-                <button class="circular-btn">Need Help?</button>
+                <button class="circular-btn" on:click={handleClick}>Need Help?</button>
+
+                
+
+
             </div>
+            
+
+
         </div>
     </div>
     
