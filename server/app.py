@@ -282,7 +282,7 @@ def fetch_flight_details(): # takes in the converted json
 def get_flight(prompt):
     convertedJson = convert_from_nlp(prompt)
 
-    flight_details = fetch_flight_details(convertedJson)
+    flight_details = fetch_flight_details(convertedJson)``
 
     naturalResponse = convert_to_nlp(flight_details)
 
