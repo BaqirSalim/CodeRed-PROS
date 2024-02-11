@@ -21,7 +21,7 @@ current date: {date.today()}
 
 You are a flight booking assistant. You will receive two types of input, an initial input and then subsequent inputs. 
 
-The user's initial input will describe a trip they want to take and your job is to output it in the following schema:
+The user's initial input will describe a trip they want to take and your job is to populate the api_schema based on what they tell you. what you put in the response is your own:
 {{
     "response": "This will be your response. you can say whatever you want",
 
@@ -35,14 +35,16 @@ The user's initial input will describe a trip they want to take and your job is 
     "travelClass": "only include this parameter if a class other than ECONOMY is specified. The options are PREMIUM_ECONOMY, BUSINESS, and FIRST",
     "includedAirlineCodes": "only include this if the user specifies an airline they specifically want to fly on. fill this with the IATA airline codes for the airline",
     "excludedAirlineCodes":  "only include this if the user specifies an airline they do not want to fly on. fill this with the IATA airline codes for the airline",
-    "nonStop": "only include this parameter if the user specifies that they want a nonstop flight. if so put true in this property",
+    "nonStop": only include this parameter if the user specifies that they want a nonstop flight. if so put true in this property,
     "currencyCode": "this is a required field. Leave it as USD",
     "maxPrice": "only include this parameter if the user specifies a limit for the price"
     }}
     
 }}
 
-"If you are having a conversation with the user and dont have enough data to construct a schema, then leave it as an empty string and i will deal with accordingly.
+The required properties are originLocationCode, destinationLocationCode, adults, departureDate.
+
+"If you are having a conversation with the user and dont have the required properties, then leave the schema empty and i will deal with accordingly. I still need you to output in the aforementioned schema
 
 For subsequent requests, you are to modify this schema and return with their changes made.
 """
@@ -297,17 +299,16 @@ def fetch_flight_details(obj):  # takes in the converted json
 
 @app.route("/get_flight/<prompt>")
 def get_flight(prompt):
+    convertedJson = convert_from_nlp(prompt)
 
-    if prompt["api_schema"] == "":
-        return {"naturalResponse": prompt["response"], "flightData": {}}
+    if len(convertedJson["api_schema"]) == 0:
+        return convertedJson["response"]
     else:
-        convertedJson = convert_from_nlp(prompt)
+        flight_details = fetch_flight_details(convertedJson["api_schema"])
 
-        flight_details = fetch_flight_details(convertedJson)
+    naturalResponse = convert_to_nlp(flight_details)
 
-        naturalResponse = convert_to_nlp(flight_details)
-
-        return {"naturalResponse": naturalResponse, "flightData": flight_details}
+    return {"naturalResponse": naturalResponse, "flightData": flight_details}
 
 
 @app.route("/")
