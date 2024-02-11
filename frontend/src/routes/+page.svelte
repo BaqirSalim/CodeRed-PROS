@@ -17,7 +17,7 @@
     	zoom = map.getZoom();
     	lng = map.getCenter().lng;
     	lat = map.getCenter().lat;
-  }
+    }
 
 	onMount(() => {
 		const initialState = { lng: lng, lat: lat, zoom: zoom };
@@ -44,30 +44,63 @@
     // MESSAGE STUFF BELOW ----------------------------------------
     
     let message = ""
+    let conversation = [
+        {
+            role : "agent",
+            message : "Hey there, how may I help you today?"
+        },
+    ]
 
-    let data = {};
+    async function addToConversation(){
+        conversation = [...conversation, {role : "user", message : message}];
 
-    onMount(async () => {
-        fetchData();
-    });
+        //displayLoadingMessage(); // Display loading message
 
-    async function fetchData() {
+        fetchData(message)
+		message = '';
+        console.log(conversation)
+    }
+
+    async function fetchData(message: string) {
         try {
-        const response = await fetch('http://127.0.0.1:5000/get_flight/i_want_to_go_from_houston_to_dallas_next_thursday');
-        const result = await response.text();
-        data = result;
-        console.log(data)
+            let data = {}
+            const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
+            const responseData = await response.json(); // Assuming the response is in JSON format
+
+            //removeLoadingMessage(); // Remove loading message
+            
+            conversation = [...conversation, {role : "agent", message : responseData.naturalResponse}];
+            console.log(responseData);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     }
+
+
     
+   /* function displayLoadingMessage() {
+        const loadingMessage = document.createElement('div');
+        loadingMessage.textContent = 'Loading...';
+        loadingMessage.classList.add('loading-message');
+        const chatbox = document.querySelector('.conversation');
+        if (chatbox) {
+            chatbox.appendChild(loadingMessage);
+        } else {
+            console.error('.conversation element not found');
+        }
+    }
+
+    function removeLoadingMessage() {
+        const loadingMessage = document.querySelector('.loading-message');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+*/
     
+
 
 </script>
-
-
-
 
 
 <style lang="postcss">
@@ -100,7 +133,7 @@
     }
     
     .chat-box {
-        @apply border border-white rounded-2xl p-8;
+        @apply max-h-full border border-white rounded-2xl p-8 overflow-y-scroll;
     }
 
     .message.from-bot {
@@ -115,7 +148,7 @@
     .message-wrapper{
         @apply flex mb-8;
     }
-    .message-wrapper:nth-child(2){
+    .message-wrapper:nth-child(n){
         @apply justify-end;
     }
 
@@ -135,11 +168,9 @@
     .circular-btn:hover{
         @apply bg-neutral-900;
     }
-  
 
-    .footer{
-        @apply flex flex-row justify-center w-full bg-neutral-700 mx-auto h-full;
-        align-items: center;
+    .message{
+        @apply bg-gray-400; 
     }
    
     .user-input{
@@ -164,19 +195,9 @@
         @apply absolute top-0 left-0 w-full h-full flex flex-col px-10 py-12 pointer-events-auto justify-between;
     }
 
-    .manualToggles{
-        @apply h-10 w-full border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl;
+    .flightInfo{
+        @apply h-full w-4/12 border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl;
     }
-    .renderedResults{
-        @apply h-40 w-full overflow-x-auto whitespace-nowrap overflow-y-hidden space-x-4;
-    }
-    .resultCard{
-        @apply h-40 w-60 border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl inline-block;
-    }
-    .renderedResults ::webkit-scrollbar {
-        @apply appearance-none;
-    }
-    
 </style>
 
 <head>
@@ -200,54 +221,40 @@
             <div class="map-wrapper">
                 <div class="map" bind:this={mapContainer}></div>
                 <div class="map-overlay">
-                    <div class="manualToggles">
+                    <div class="flightInfo">
 
-                    </div>
-                    <div class="renderedResults">
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        
                     </div>
                 </div>
             </div>
 
             <div class="chat-box" id="chatBox">
-                <div class="bot-messages">
-                   
+                {#each conversation as { role, message }}
+                    {#if role === 'agent'}
                         <div class="message-wrapper">
-                            <div class="message bot-message">
+                            <div class="message from-bot">
                                 <div class="message-text">{message}</div>
                             </div>
                         </div>
-                   
-                </div>
-            
-                <div class="user-messages">
-                   
+                    {:else if role === 'user'}
                         <div class="message-wrapper">
-                            <div class="message user-message">
+                            <div class="message from-user">
                                 <div class="message-text">{message}</div>
                             </div>
                         </div>
-                  
-                </div>
+                    {/if}
+                {/each}
             </div>
 
         </div>
         
         <div class="bottom">
             <div class="chatInput">
-                <input type="text" id="userInput" class="user-input" placeholder="Type your message here...">
+                <input type="text" id="userInput" bind:value={message} class="user-input" placeholder="Type your message here...">
                 <div class="chatSendBtn">
-                    <form action="http://127.0.0.1:5000/get/flights" method="post">
-                        <button class="send-btn"><span>➤</span></button>
-                    </form>
+                    <button  on:click={addToConversation} class="send-btn"><span>➤</span></button>
                 </div>
             </div>
         </div>
+        
     </section>
 </section>

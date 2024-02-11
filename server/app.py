@@ -117,85 +117,6 @@ def convert_from_nlp(prompt):
 
 @app.route("/nlp_convert")
 def convert_to_nlp(obj):  # this will take in an object
-    # obje = {
-    #     "itineraries": [
-    #         {
-    #             "duration": "PT14H15M",
-    #             "segments": [
-    #                 {
-    #                     "departure": {
-    #                         "iataCode": "SYD",
-    #                         "terminal": "1",
-    #                         "at": "2021-11-01T11:35:00",
-    #                     },
-    #                     "arrival": {
-    #                         "iataCode": "MNL",
-    #                         "terminal": "2",
-    #                         "at": "2021-11-01T16:50:00",
-    #                     },
-    #                     "carrierCode": "PR",
-    #                     "number": "212",
-    #                     "aircraft": {"code": "333"},
-    #                     "operating": {"carrierCode": "PR"},
-    #                     "duration": "PT8H15M",
-    #                     "id": "1",
-    #                     "numberOfStops": 0,
-    #                     "blacklistedInEU": False,
-    #                 },
-    #                 {
-    #                     "departure": {
-    #                         "iataCode": "MNL",
-    #                         "terminal": "1",
-    #                         "at": "2021-11-01T19:20:00",
-    #                     },
-    #                     "arrival": {"iataCode": "BKK", "at": "2021-11-01T21:50:00"},
-    #                     "carrierCode": "PR",
-    #                     "number": "732",
-    #                     "aircraft": {"code": "320"},
-    #                     "operating": {"carrierCode": "PR"},
-    #                     "duration": "PT3H30M",
-    #                     "id": "2",
-    #                     "numberOfStops": 0,
-    #                     "blacklistedInEU": False,
-    #                 },
-    #             ],
-    #         }
-    #     ],
-    #     "price": {
-    #         "currency": "EUR",
-    #         "total": "355.34",
-    #         "base": "255.00",
-    #         "fees": [
-    #             {"amount": "0.00", "type": "SUPPLIER"},
-    #             {"amount": "0.00", "type": "TICKETING"},
-    #         ],
-    #         "grandTotal": "355.34",
-    #     },
-    #     "travelerPricings": [
-    #         {
-    #             "travelerId": "1",
-    #             "fareOption": "STANDARD",
-    #             "travelerType": "ADULT",
-    #             "price": {"currency": "EUR", "total": "355.34", "base": "255.00"},
-    #             "fareDetailsBySegment": [
-    #                 {
-    #                     "segmentId": "1",
-    #                     "cabin": "ECONOMY",
-    #                     "fareBasis": "EOBAU",
-    #                     "class": "E",
-    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
-    #                 },
-    #                 {
-    #                     "segmentId": "2",
-    #                     "cabin": "ECONOMY",
-    #                     "fareBasis": "EOBAU",
-    #                     "class": "E",
-    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
-    #                 },
-    #             ],
-    #         }
-    #     ],
-    # }
     response = jsonConvert.send_message(json.dumps(obj))
     return response.text
 
@@ -302,3 +223,86 @@ def get_flight(prompt):
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+
+
+
+    # obje = {
+    #     "itineraries": [
+    #         {
+    #             "duration": "PT14H15M",
+    #             "segments": [
+    #                 {
+    #                     "departure": {
+    #                         "iataCode": "SYD",
+    #                         "terminal": "1",
+    #                         "at": "2021-11-01T11:35:00",
+    #                     },
+    #                     "arrival": {
+    #                         "iataCode": "MNL",
+    #                         "terminal": "2",
+    #                         "at": "2021-11-01T16:50:00",
+    #                     },
+    #                     "carrierCode": "PR",
+    #                     "number": "212",
+    #                     "aircraft": {"code": "333"},
+    #                     "operating": {"carrierCode": "PR"},
+    #                     "duration": "PT8H15M",
+    #                     "id": "1",
+    #                     "numberOfStops": 0,
+    #                     "blacklistedInEU": False,
+    #                 },
+    #                 {
+    #                     "departure": {
+    #                         "iataCode": "MNL",
+    #                         "terminal": "1",
+    #                         "at": "2021-11-01T19:20:00",
+    #                     },
+    #                     "arrival": {"iataCode": "BKK", "at": "2021-11-01T21:50:00"},
+    #                     "carrierCode": "PR",
+    #                     "number": "732",
+    #                     "aircraft": {"code": "320"},
+    #                     "operating": {"carrierCode": "PR"},
+    #                     "duration": "PT3H30M",
+    #                     "id": "2",
+    #                     "numberOfStops": 0,
+    #                     "blacklistedInEU": False,
+    #                 },
+    #             ],
+    #         }
+    #     ],
+    #     "price": {
+    #         "currency": "EUR",
+    #         "total": "355.34",
+    #         "base": "255.00",
+    #         "fees": [
+    #             {"amount": "0.00", "type": "SUPPLIER"},
+    #             {"amount": "0.00", "type": "TICKETING"},
+    #         ],
+    #         "grandTotal": "355.34",
+    #     },
+    #     "travelerPricings": [
+    #         {
+    #             "travelerId": "1",
+    #             "fareOption": "STANDARD",
+    #             "travelerType": "ADULT",
+    #             "price": {"currency": "EUR", "total": "355.34", "base": "255.00"},
+    #             "fareDetailsBySegment": [
+    #                 {
+    #                     "segmentId": "1",
+    #                     "cabin": "ECONOMY",
+    #                     "fareBasis": "EOBAU",
+    #                     "class": "E",
+    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+    #                 },
+    #                 {
+    #                     "segmentId": "2",
+    #                     "cabin": "ECONOMY",
+    #                     "fareBasis": "EOBAU",
+    #                     "class": "E",
+    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+    #                 },
+    #             ],
+    #         }
+    #     ],
+    # }
