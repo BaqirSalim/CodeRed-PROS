@@ -53,7 +53,7 @@
 
     async function fetchData() {
         try {
-        const response = await fetch('http://127.0.0.1:5000/get_flight/i_want_to_go_from_houston_to_dallas_next_thursday_and_come_back_3_days_later_and_i_have_1_child_with_me');
+        const response = await fetch('http://127.0.0.1:5000/get_flight/i_want_to_go_from_houston_to_dallas_next_thursday');
         const result = await response.text();
         data = result;
         console.log(data)

@@ -12,6 +12,8 @@ app = Flask(__name__)
 
 CORS(app, origins=["*"])
 
+# socketio = SocketIO(app)
+
 genai.configure(api_key="AIzaSyCIPjPfDJIf9Ueqz5mfWMUZ3LFXoGvyisg")
 
 INITIAL_PROMPT = f"""
@@ -23,12 +25,13 @@ You are a flight booking assistant. The user will make a request to you and your
     "destinationLocationCode": "The place they want to go to. fill this with the IATA code for the city",
     "departureDate": "The day they'd like to travel on. calculate this using the current date provided",
     "returnDate": "The day they'd like to come back. Only provide this property if the return date is specified",
-    "adults": "assume all passengers are adults unless otherwise specified. Only include this property if the number of passengers is greater than 1",
+    "adults": "assume all passengers are adults unless otherwise specified. Default this value to 1 unless otherwise specified",
     "children": "only include this parameter if the number of children specified is greater than 0",
     "travelClass": "only include this parameter if a class other than ECONOMY is specified. The options are PREMIUM_ECONOMY, BUSINESS, and FIRST",
     "includedAirlineCodes": "only include this if the user specifies an airline they specifically want to fly on. fill this with the IATA airline codes for the airline",
     "excludedAirlineCodes":  "only include this if the user specifies an airline they do not want to fly on. fill this with the IATA airline codes for the airline",
     "nonStop": "only include this parameter if the user specifies that they want a nonstop flight. if so put true in this property",
+    "currencyCode": "this is a required field. Leave it as USD",
     "maxPrice": "only include this parameter if the user specifies a limit for the price"
 }}
 """
@@ -43,7 +46,7 @@ Schema:
 "travelerPricings": "this array will include more details about the trip. the important thing to grab from here is the cabin level (economy, business, etc)"
 }
 
-Only respond with a few sentences that describe the trip using this data: departure, arrival, duration, price, and carry on information.
+Only respond with a few sentences regarding the trip. Don't say things like 'here is a summary of your trip'.
 """
 
 generation_config = {
@@ -207,7 +210,7 @@ def fetch_flight_details(obj):  # takes in the converted json
         if response.status_code == 200:
             # Extract access token from the response
             access_token = response.json()["access_token"]
-            print("Access Token:", access_token)
+            # print("Access Token:", access_token)
         else:
             # Print error message if request was not successful
             print("Error:", response.status_code)
