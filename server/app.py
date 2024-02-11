@@ -302,7 +302,7 @@ def get_flight(prompt):
     convertedJson = convert_from_nlp(prompt)
 
     if len(convertedJson["api_schema"]) == 0:
-        return convertedJson["response"]
+        return {"naturalResponse": convertedJson["response"], "flightData": {}}
     else:
         flight_details = fetch_flight_details(convertedJson["api_schema"])
 
