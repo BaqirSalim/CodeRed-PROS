@@ -133,7 +133,7 @@
     }
     
     .chat-box {
-        @apply border border-white rounded-2xl p-8 overflow-y-scroll;
+        @apply max-h-8 border border-white rounded-2xl p-8 overflow-y-scroll;
     }
 
     .message.from-bot {

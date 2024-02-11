@@ -19,11 +19,13 @@ genai.configure(api_key="AIzaSyCIPjPfDJIf9Ueqz5mfWMUZ3LFXoGvyisg")
 INITIAL_PROMPT = f"""
 current date: {date.today()}
 
-You are a flight booking assistant. The user will make a request to you and your job is to output it in the following schema:
+You are a flight booking assistant. You will receive two types of input, an initial input and then subsequent inputs. 
+
+The user's initial input will describe a trip they want to take and your job is to output it in the following schema:
 {{
     "originLocationCode": "The place they want to travel from. Fill this with the IATA code for the city",
     "destinationLocationCode": "The place they want to go to. fill this with the IATA code for the city",
-    "departureDate": "The day they'd like to travel on. calculate this using the current date provided",
+    "departureDate": "The day they'd like to travel on. calculate this using the current date provided. If no date is provided, assume it is the current date",
     "returnDate": "The day they'd like to come back. Only provide this property if the return date is specified",
     "adults": "assume all passengers are adults unless otherwise specified. Default this value to 1 unless otherwise specified",
     "children": "only include this parameter if the number of children specified is greater than 0",
@@ -34,6 +36,8 @@ You are a flight booking assistant. The user will make a request to you and your
     "currencyCode": "this is a required field. Leave it as USD",
     "maxPrice": "only include this parameter if the user specifies a limit for the price"
 }}
+
+For subsequent requests, you are to modify this schema and return with their changes made.
 """
 
 CONVERT_PROMPT = """
@@ -75,12 +79,22 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
 )
 
-chat = model.start_chat(
-    history=[
-        {"role": "user", "parts": [INITIAL_PROMPT]},
-        {"role": "model", "parts": ["understood"]},
-    ]
-)
+
+conversationLog = [
+    {"role": "user", "parts": [INITIAL_PROMPT]},
+    {"role": "model", "parts": ["understood"]},
+]
+
+
+def addTurn(role, content):
+    conversationLog.append({"role": role, "parts": [content]})
+
+
+def generateChat():
+    return model.generate_content(conversationLog).text
+
+
+chat = model.start_chat(history=conversationLog)
 
 jsonConvert = model.start_chat(
     history=[
@@ -199,7 +213,7 @@ def get_flight(prompt):
 
     naturalResponse = convert_to_nlp(flight_details)
 
-    return naturalResponse
+    return {"naturalResponse": naturalResponse, "flightData": flight_details}
 
 
 @app.route("/")
