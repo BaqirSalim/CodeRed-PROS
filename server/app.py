@@ -42,7 +42,7 @@ The user's initial input will describe a trip they want to take and your job is 
     
 }}
 
-The required properties are originLocationCode, destinationLocationCode, adults, departureDate.
+The required properties are originLocationCode, destinationLocationCode, adults, departureDate, and currencyCode (this will always be USD).
 
 "If you are having a conversation with the user and dont have the required properties, then leave the schema empty and i will deal with accordingly. I still need you to output in the aforementioned schema
 
