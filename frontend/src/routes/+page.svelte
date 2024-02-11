@@ -51,7 +51,7 @@
     let isModalOpen = false;
 
     function handleClick() {
-    isModalOpen = true;
+        isModalOpen = true;
         dispatch('toggleModal');
     }
 
@@ -81,18 +81,18 @@
 
     async function fetchData(message: string) {
 
-        let response = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-        conversation = [...conversation, {role : "agent", message : response}];
+        // let response = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        // conversation = [...conversation, {role : "agent", message : response}];
 
-        // try {
-        //     const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
-        //     const responseData = await response.json(); // Assuming the response is in JSON format
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
+            const responseData = await response.json(); // Assuming the response is in JSON format
             
-        //     conversation = [...conversation, {role : "agent", message : responseData.naturalResponse}];
-        //     console.log(responseData);
-        // } catch (error) {
-        //     console.error('Error fetching data:', error);
-        // }
+            conversation = [...conversation, {role : "agent", message : responseData.naturalResponse}];
+            console.log(responseData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     }
 
 </script>
@@ -121,14 +121,14 @@
         @apply grid grid-cols-[8fr_3fr] gap-8 mt-8 mx-auto w-[98%] h-[80%];
     }
     .map{
-        @apply max-h-[700px] w-full h-full;
+        @apply w-full h-full;
     }
     .map-wrapper{
-        @apply relative border border-white rounded-2xl p-8;
+        @apply relative border border-white rounded-2xl p-8 max-h-[740px];
     }
     
     .chat-box {
-        @apply max-h-[700px] border border-white rounded-2xl p-8 overflow-y-scroll;
+        @apply max-h-[750px] h-full border border-white rounded-2xl p-8 overflow-y-scroll;
     }
     .chat-box::-webkit-scrollbar{
         @apply w-3 ;
@@ -171,6 +171,21 @@
         @apply bg-neutral-900;
     }
 
+    .modal-wrapper{
+        @apply fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-black bg-opacity-50 z-50;
+    }
+    .modal{
+        @apply w-4/6 h-4/6 bg-white p-8 rounded-3xl;
+    }
+    .modal-close{
+        @apply w-full flex justify-end;
+    }
+
+    .modal-close span{
+        @apply text-black text-3xl;
+    }
+
+
     .message{
         @apply bg-gray-400; 
     }
@@ -212,22 +227,8 @@
             <a href="/" class="nav-link">FlightChat</a>
             <div class="helpbtn">
                 <!-- Make the help button here -->
-                <button class="circular-btn" on:click={handleClick}>Need Help?</button>
-
-                {#if isModalOpen}
-                    <button class="modal-backdrop" aria-label="Close Modal" on:click={closeModal}></button>
-                    <div class="modal-content">
-                        <!-- Your modal content goes here -->
-                        <p></p>
-                        <div class="gray-square"></div>
-                    </div>
-                {/if}
-
-
+                <button class="circular-btn" on:click={handleClick}>Project Info</button>
             </div>
-            
-
-
         </div>
     </div>
     
@@ -274,3 +275,14 @@
         
     </section>
 </section>
+
+{#if isModalOpen}
+<div class="modal-wrapper">
+    <div class="modal">
+        <div class="modal-close">
+            <button on:click={closeModal} class=""><span>✖</span></button>
+            <p>We a</p>
+        </div>
+    </div>
+</div>
+{/if}
