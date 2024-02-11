@@ -2,12 +2,15 @@ import requests
 from datetime import date, datetime
 import json
 from flask import Flask
+from flask_cors import CORS
+
 import google.generativeai as genai
 
 # import server.config as config
 
 app = Flask(__name__)
 
+CORS(app, origins=["*"])
 
 genai.configure(api_key="AIzaSyCIPjPfDJIf9Ueqz5mfWMUZ3LFXoGvyisg")
 

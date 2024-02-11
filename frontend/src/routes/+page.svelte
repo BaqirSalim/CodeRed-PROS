@@ -45,6 +45,22 @@
     
     let message = ""
 
+    let data = {};
+
+    onMount(async () => {
+        fetchData();
+    });
+
+    async function fetchData() {
+        try {
+        const response = await fetch('http://127.0.0.1:5000/get_flight/i_want_to_go_from_houston_to_dallas_next_thursday_and_come_back_3_days_later_and_i_have_1_child_with_me');
+        const result = await response.text();
+        data = result;
+        console.log(data)
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
     
     
 
@@ -227,7 +243,9 @@
             <div class="chatInput">
                 <input type="text" id="userInput" class="user-input" placeholder="Type your message here...">
                 <div class="chatSendBtn">
-                    <button class="send-btn"><span>➤</span></button>
+                    <form action="http://127.0.0.1:5000/get/flights" method="post">
+                        <button class="send-btn"><span>➤</span></button>
+                    </form>
                 </div>
             </div>
         </div>
