@@ -43,6 +43,10 @@ For subsequent requests, you are to modify this schema and return with their cha
 CONVERT_PROMPT = """
 your job is to convert the following schema into natural language that can be spoken in conversation.
 
+You will recieve two kinds of inputs, one initial input where you will show the suggested flight itinerary, and then subsequent inputs that are variations of the original. 
+
+I want you to deliver your response in a conversational manner. For the first output you can say things like "this is what your flight will look like" and then for subsequent ones you can say things like "how about a flight like this: "
+
 Schema:
 {
 "itineraries": "an array of flights for the trip",
@@ -50,7 +54,7 @@ Schema:
 "travelerPricings": "this array will include more details about the trip. the important thing to grab from here is the cabin level (economy, business, etc)"
 }
 
-Only respond with a few sentences regarding the trip. Don't say things like 'here is a summary of your trip'.
+Your response will be a summary of the trip using the data youre given from the schema.
 """
 
 generation_config = {
@@ -85,6 +89,11 @@ conversationLog = [
     {"role": "model", "parts": ["understood"]},
 ]
 
+convertLog = [
+    {"role": "user", "parts": [CONVERT_PROMPT]},
+    {"role": "model", "parts": ["understood"]},
+]
+
 
 def addTurn(role, content):
     conversationLog.append({"role": role, "parts": [content]})
@@ -96,12 +105,7 @@ def generateChat():
 
 chat = model.start_chat(history=conversationLog)
 
-jsonConvert = model.start_chat(
-    history=[
-        {"role": "user", "parts": [CONVERT_PROMPT]},
-        {"role": "model", "parts": ["understood"]},
-    ]
-)
+jsonConvert = model.start_chat(history=convertLog)
 
 
 @app.route("/convert_nlp/<prompt>")
