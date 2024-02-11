@@ -18,7 +18,7 @@ You are a flight booking assistant. The user will make a request to you and your
     "originLocationCode": "The place they want to travel from. Fill this with the IATA code for the city",
     "destinationLocationCode": "The place they want to go to. fill this with the IATA code for the city",
     "departureDate": "The day they'd like to travel on. calculate this using the current date provided",
-    "returnDate": "The day they'd like to come back",
+    "returnDate": "The day they'd like to come back. Only provide this property if the return date is specified",
     "adults": "assume all passengers are adults unless otherwise specified. Only include this property if the number of passengers is greater than 1",
     "children": "only include this parameter if the number of children specified is greater than 0",
     "travelClass": "only include this parameter if a class other than ECONOMY is specified. The options are PREMIUM_ECONOMY, BUSINESS, and FIRST",
@@ -27,6 +27,19 @@ You are a flight booking assistant. The user will make a request to you and your
     "nonStop": "only include this parameter if the user specifies that they want a nonstop flight. if so put true in this property",
     "maxPrice": "only include this parameter if the user specifies a limit for the price"
 }}
+"""
+
+CONVERT_PROMPT = """
+your job is to convert the following schema into natural language that can be spoken in conversation.
+
+Schema:
+{
+"itineraries": "an array of flights for the trip",
+"price": "a breakdown of the price, including total cost",
+"travelerPricings": "this array will include more details about the trip. the important thing to grab from here is the cabin level (economy, business, etc)"
+}
+
+Respond only with a few sentences that describe the trip using this data: departure, arrival, duration, price, and carry on information.
 """
 
 generation_config = {
@@ -62,15 +75,119 @@ chat = model.start_chat(
     ]
 )
 
+jsonConvert = model.start_chat(
+    history=[
+        {"role": "user", "parts": [CONVERT_PROMPT]},
+        {"role": "model", "parts": ["understood"]},
+    ]
+)
+
 
 @app.route("/convert_nlp/<prompt>")
-def convert_nlp(prompt):
+def convert_from_nlp(prompt):
     response = chat.send_message(prompt)
     json_response = json.loads(response.text)
-    # json_object = json.dumps(json_response, indent=4)
     return json_response
 
-def fetch_flight_details(obj):
+
+@app.route("/nlp_convert")
+def convert_to_nlp(): #this will take in an object
+    obje = {
+        "itineraries": [
+            {
+                "duration": "PT14H15M",
+                "segments": [
+                    {
+                        "departure": {
+                            "iataCode": "SYD",
+                            "terminal": "1",
+                            "at": "2021-11-01T11:35:00",
+                        },
+                        "arrival": {
+                            "iataCode": "MNL",
+                            "terminal": "2",
+                            "at": "2021-11-01T16:50:00",
+                        },
+                        "carrierCode": "PR",
+                        "number": "212",
+                        "aircraft": {"code": "333"},
+                        "operating": {"carrierCode": "PR"},
+                        "duration": "PT8H15M",
+                        "id": "1",
+                        "numberOfStops": 0,
+                        "blacklistedInEU": False,
+                    },
+                    {
+                        "departure": {
+                            "iataCode": "MNL",
+                            "terminal": "1",
+                            "at": "2021-11-01T19:20:00",
+                        },
+                        "arrival": {"iataCode": "BKK", "at": "2021-11-01T21:50:00"},
+                        "carrierCode": "PR",
+                        "number": "732",
+                        "aircraft": {"code": "320"},
+                        "operating": {"carrierCode": "PR"},
+                        "duration": "PT3H30M",
+                        "id": "2",
+                        "numberOfStops": 0,
+                        "blacklistedInEU": False,
+                    },
+                ],
+            }
+        ],
+        "price": {
+            "currency": "EUR",
+            "total": "355.34",
+            "base": "255.00",
+            "fees": [
+                {"amount": "0.00", "type": "SUPPLIER"},
+                {"amount": "0.00", "type": "TICKETING"},
+            ],
+            "grandTotal": "355.34",
+        },
+        "travelerPricings": [
+            {
+                "travelerId": "1",
+                "fareOption": "STANDARD",
+                "travelerType": "ADULT",
+                "price": {"currency": "EUR", "total": "355.34", "base": "255.00"},
+                "fareDetailsBySegment": [
+                    {
+                        "segmentId": "1",
+                        "cabin": "ECONOMY",
+                        "fareBasis": "EOBAU",
+                        "class": "E",
+                        "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+                    },
+                    {
+                        "segmentId": "2",
+                        "cabin": "ECONOMY",
+                        "fareBasis": "EOBAU",
+                        "class": "E",
+                        "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+                    },
+                ],
+            }
+        ],
+    }
+    response = jsonConvert.send_message(json.dumps(obje))
+    return response.text
+
+
+def fetch_flight_details(): # takes in the converted json
+    #matthews code
+    return
+
+@app.route("/get_flight/<prompt>")
+def get_flight(prompt):
+    convertedJson = convert_from_nlp(prompt)
+
+    flight_details = fetch_flight_details(convertedJson)
+
+    naturalResponse = convert_to_nlp(flight_details)
+
+    return naturalResponse
 
 
 
