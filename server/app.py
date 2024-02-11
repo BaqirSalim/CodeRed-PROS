@@ -1,4 +1,5 @@
-from datetime import date
+import requests
+from datetime import date, datetime
 import json
 from flask import Flask
 import google.generativeai as genai
@@ -176,8 +177,106 @@ def convert_to_nlp(): #this will take in an object
 
 
 def fetch_flight_details(): # takes in the converted json
-    #matthews code
-    return
+    # Define client ID and client secret
+    CLIENT_ID = 'nEJEFKF5JWhWT0Fj6NnGoqGR2duITg8L'
+    CLIENT_SECRET = 'G3AV2ekuaAvGEVRW'
+
+
+
+
+    BASE_URL = 'https://test.api.amadeus.com'
+
+    # Construct the endpoint for obtaining access token
+    endpoint = '/v1/security/oauth2/token'
+
+    # Construct the URL
+    url = BASE_URL + endpoint
+
+    # Define payload with grant_type, client_id, and client_secret
+    payload = {
+        'grant_type': 'client_credentials',
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET
+    }
+
+    try:
+        # Make the POST request to obtain access token
+        response = requests.post(url, data=payload)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Extract access token from the response
+            access_token = response.json()['access_token']
+            print("Access Token:", access_token)
+        else:
+            # Print error message if request was not successful
+            print("Error:", response.status_code)
+            print(response.text)
+    except requests.exceptions.RequestException as e:
+        # Print any exceptions that occur during the request
+        print("Error:", e)
+
+
+
+
+
+
+    # Construct the authentication header
+    auth_header = {
+        'Authorization': f'Bearer ' + access_token
+    }
+
+    # Define the base URL for the Amadeus API
+    BASE_URL = 'https://test.api.amadeus.com/v2'
+
+    # Construct the endpoint for the flight offer search
+    endpoint = '/shopping/flight-offers'
+
+    # Construct the URL
+    url = BASE_URL + endpoint
+
+    # Define parameters for the flight offer search
+
+    # THESE PARAMETERS WILL NEED TO BE FILLED WITH DATA GIVEN FROM USER NLP
+    params = {
+        'originLocationCode': 'IAH',
+        'destinationLocationCode': 'DFW',
+        'departureDate': '2024-02-11',
+        'adults': 1,
+        'nonStop': 'true',
+    }
+
+    try:
+        # Make the GET request to the Amadeus API
+        response = requests.get(url, headers=auth_header, params=params)
+
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Print the response data
+            offers = response.json()['data']
+
+            itineraries = offers[0]['itineraries']
+            prices = offers[0]['price']
+            travelerPricings = offers[0]['travelerPricings']
+
+            toReturn ={
+                "itineraries": itineraries,
+                "prices": prices,
+                "travelerPricings": travelerPricings
+            }   
+            print(toReturn)
+        else:
+            # Print error message if request was not successful
+            print("Error:", response.status_code)
+            print(response.text)
+    except requests.exceptions.RequestException as e:
+        # Print any exceptions that occur during the request
+        print("Error:", e)
+        return
+
+
+
+
 
 @app.route("/get_flight/<prompt>")
 def get_flight(prompt):
