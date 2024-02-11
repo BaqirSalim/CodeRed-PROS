@@ -40,7 +40,7 @@ Schema:
 "travelerPricings": "this array will include more details about the trip. the important thing to grab from here is the cabin level (economy, business, etc)"
 }
 
-Respond only with a few sentences that describe the trip using this data: departure, arrival, duration, price, and carry on information.
+Only respond with a few sentences that describe the trip using this data: departure, arrival, duration, price, and carry on information.
 """
 
 generation_config = {
@@ -92,111 +92,108 @@ def convert_from_nlp(prompt):
 
 
 @app.route("/nlp_convert")
-def convert_to_nlp(): #this will take in an object
-    obje = {
-        "itineraries": [
-            {
-                "duration": "PT14H15M",
-                "segments": [
-                    {
-                        "departure": {
-                            "iataCode": "SYD",
-                            "terminal": "1",
-                            "at": "2021-11-01T11:35:00",
-                        },
-                        "arrival": {
-                            "iataCode": "MNL",
-                            "terminal": "2",
-                            "at": "2021-11-01T16:50:00",
-                        },
-                        "carrierCode": "PR",
-                        "number": "212",
-                        "aircraft": {"code": "333"},
-                        "operating": {"carrierCode": "PR"},
-                        "duration": "PT8H15M",
-                        "id": "1",
-                        "numberOfStops": 0,
-                        "blacklistedInEU": False,
-                    },
-                    {
-                        "departure": {
-                            "iataCode": "MNL",
-                            "terminal": "1",
-                            "at": "2021-11-01T19:20:00",
-                        },
-                        "arrival": {"iataCode": "BKK", "at": "2021-11-01T21:50:00"},
-                        "carrierCode": "PR",
-                        "number": "732",
-                        "aircraft": {"code": "320"},
-                        "operating": {"carrierCode": "PR"},
-                        "duration": "PT3H30M",
-                        "id": "2",
-                        "numberOfStops": 0,
-                        "blacklistedInEU": False,
-                    },
-                ],
-            }
-        ],
-        "price": {
-            "currency": "EUR",
-            "total": "355.34",
-            "base": "255.00",
-            "fees": [
-                {"amount": "0.00", "type": "SUPPLIER"},
-                {"amount": "0.00", "type": "TICKETING"},
-            ],
-            "grandTotal": "355.34",
-        },
-        "travelerPricings": [
-            {
-                "travelerId": "1",
-                "fareOption": "STANDARD",
-                "travelerType": "ADULT",
-                "price": {"currency": "EUR", "total": "355.34", "base": "255.00"},
-                "fareDetailsBySegment": [
-                    {
-                        "segmentId": "1",
-                        "cabin": "ECONOMY",
-                        "fareBasis": "EOBAU",
-                        "class": "E",
-                        "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
-                    },
-                    {
-                        "segmentId": "2",
-                        "cabin": "ECONOMY",
-                        "fareBasis": "EOBAU",
-                        "class": "E",
-                        "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
-                    },
-                ],
-            }
-        ],
-    }
-    response = jsonConvert.send_message(json.dumps(obje))
+def convert_to_nlp(obj):  # this will take in an object
+    # obje = {
+    #     "itineraries": [
+    #         {
+    #             "duration": "PT14H15M",
+    #             "segments": [
+    #                 {
+    #                     "departure": {
+    #                         "iataCode": "SYD",
+    #                         "terminal": "1",
+    #                         "at": "2021-11-01T11:35:00",
+    #                     },
+    #                     "arrival": {
+    #                         "iataCode": "MNL",
+    #                         "terminal": "2",
+    #                         "at": "2021-11-01T16:50:00",
+    #                     },
+    #                     "carrierCode": "PR",
+    #                     "number": "212",
+    #                     "aircraft": {"code": "333"},
+    #                     "operating": {"carrierCode": "PR"},
+    #                     "duration": "PT8H15M",
+    #                     "id": "1",
+    #                     "numberOfStops": 0,
+    #                     "blacklistedInEU": False,
+    #                 },
+    #                 {
+    #                     "departure": {
+    #                         "iataCode": "MNL",
+    #                         "terminal": "1",
+    #                         "at": "2021-11-01T19:20:00",
+    #                     },
+    #                     "arrival": {"iataCode": "BKK", "at": "2021-11-01T21:50:00"},
+    #                     "carrierCode": "PR",
+    #                     "number": "732",
+    #                     "aircraft": {"code": "320"},
+    #                     "operating": {"carrierCode": "PR"},
+    #                     "duration": "PT3H30M",
+    #                     "id": "2",
+    #                     "numberOfStops": 0,
+    #                     "blacklistedInEU": False,
+    #                 },
+    #             ],
+    #         }
+    #     ],
+    #     "price": {
+    #         "currency": "EUR",
+    #         "total": "355.34",
+    #         "base": "255.00",
+    #         "fees": [
+    #             {"amount": "0.00", "type": "SUPPLIER"},
+    #             {"amount": "0.00", "type": "TICKETING"},
+    #         ],
+    #         "grandTotal": "355.34",
+    #     },
+    #     "travelerPricings": [
+    #         {
+    #             "travelerId": "1",
+    #             "fareOption": "STANDARD",
+    #             "travelerType": "ADULT",
+    #             "price": {"currency": "EUR", "total": "355.34", "base": "255.00"},
+    #             "fareDetailsBySegment": [
+    #                 {
+    #                     "segmentId": "1",
+    #                     "cabin": "ECONOMY",
+    #                     "fareBasis": "EOBAU",
+    #                     "class": "E",
+    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+    #                 },
+    #                 {
+    #                     "segmentId": "2",
+    #                     "cabin": "ECONOMY",
+    #                     "fareBasis": "EOBAU",
+    #                     "class": "E",
+    #                     "includedCheckedBags": {"weight": 25, "weightUnit": "KG"},
+    #                 },
+    #             ],
+    #         }
+    #     ],
+    # }
+    response = jsonConvert.send_message(json.dumps(obj))
     return response.text
 
 
-def fetch_flight_details(): # takes in the converted json
+def fetch_flight_details(obj):  # takes in the converted json
     # Define client ID and client secret
-    CLIENT_ID = 'nEJEFKF5JWhWT0Fj6NnGoqGR2duITg8L'
-    CLIENT_SECRET = 'G3AV2ekuaAvGEVRW'
+    CLIENT_ID = "nEJEFKF5JWhWT0Fj6NnGoqGR2duITg8L"
+    CLIENT_SECRET = "G3AV2ekuaAvGEVRW"
 
-
-
-
-    BASE_URL = 'https://test.api.amadeus.com'
+    BASE_URL = "https://test.api.amadeus.com"
 
     # Construct the endpoint for obtaining access token
-    endpoint = '/v1/security/oauth2/token'
+    endpoint = "/v1/security/oauth2/token"
 
     # Construct the URL
     url = BASE_URL + endpoint
 
     # Define payload with grant_type, client_id, and client_secret
     payload = {
-        'grant_type': 'client_credentials',
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET
+        "grant_type": "client_credentials",
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
     }
 
     try:
@@ -206,7 +203,7 @@ def fetch_flight_details(): # takes in the converted json
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
             # Extract access token from the response
-            access_token = response.json()['access_token']
+            access_token = response.json()["access_token"]
             print("Access Token:", access_token)
         else:
             # Print error message if request was not successful
@@ -216,21 +213,14 @@ def fetch_flight_details(): # takes in the converted json
         # Print any exceptions that occur during the request
         print("Error:", e)
 
-
-
-
-
-
     # Construct the authentication header
-    auth_header = {
-        'Authorization': f'Bearer ' + access_token
-    }
+    auth_header = {"Authorization": f"Bearer " + access_token}
 
     # Define the base URL for the Amadeus API
-    BASE_URL = 'https://test.api.amadeus.com/v2'
+    BASE_URL = "https://test.api.amadeus.com/v2"
 
     # Construct the endpoint for the flight offer search
-    endpoint = '/shopping/flight-offers'
+    endpoint = "/shopping/flight-offers"
 
     # Construct the URL
     url = BASE_URL + endpoint
@@ -238,33 +228,33 @@ def fetch_flight_details(): # takes in the converted json
     # Define parameters for the flight offer search
 
     # THESE PARAMETERS WILL NEED TO BE FILLED WITH DATA GIVEN FROM USER NLP
-    params = {
-        'originLocationCode': 'IAH',
-        'destinationLocationCode': 'DFW',
-        'departureDate': '2024-02-11',
-        'adults': 1,
-        'nonStop': 'true',
-    }
+    # params = {
+    #     'originLocationCode': 'IAH',
+    #     'destinationLocationCode': 'DFW',
+    #     'departureDate': '2024-02-11',
+    #     'adults': 1,
+    #     'nonStop': 'true',
+    # }
 
     try:
         # Make the GET request to the Amadeus API
-        response = requests.get(url, headers=auth_header, params=params)
+        response = requests.get(url, headers=auth_header, params=obj)
 
         # Check if the request was successful (status code 200)
         if response.status_code == 200:
             # Print the response data
-            offers = response.json()['data']
+            offers = response.json()["data"]
 
-            itineraries = offers[0]['itineraries']
-            prices = offers[0]['price']
-            travelerPricings = offers[0]['travelerPricings']
+            itineraries = offers[0]["itineraries"]
+            prices = offers[0]["price"]
+            travelerPricings = offers[0]["travelerPricings"]
 
-            toReturn ={
+            toReturn = {
                 "itineraries": itineraries,
                 "prices": prices,
-                "travelerPricings": travelerPricings
-            }   
-            print(toReturn)
+                "travelerPricings": travelerPricings,
+            }
+            return toReturn
         else:
             # Print error message if request was not successful
             print("Error:", response.status_code)
@@ -272,22 +262,17 @@ def fetch_flight_details(): # takes in the converted json
     except requests.exceptions.RequestException as e:
         # Print any exceptions that occur during the request
         print("Error:", e)
-        return
-
-
-
 
 
 @app.route("/get_flight/<prompt>")
 def get_flight(prompt):
     convertedJson = convert_from_nlp(prompt)
 
-    flight_details = fetch_flight_details(convertedJson)``
+    flight_details = fetch_flight_details(convertedJson)
 
     naturalResponse = convert_to_nlp(flight_details)
 
     return naturalResponse
-
 
 
 @app.route("/")
