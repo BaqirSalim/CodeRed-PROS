@@ -17,7 +17,7 @@
     	zoom = map.getZoom();
     	lng = map.getCenter().lng;
     	lat = map.getCenter().lat;
-  }
+    }
 
 	onMount(() => {
 		const initialState = { lng: lng, lat: lat, zoom: zoom };
@@ -44,14 +44,49 @@
     // MESSAGE STUFF BELOW ----------------------------------------
     
     let message = ""
+    let conversation = [
+        {
+            role : "agent",
+            message : "Hey there, how may I help you today?"
+        },
+    ]
 
-    
-    
+    async function addToConversation(){
+        conversation = [...conversation, {role : "user", message : message}];
+        fetchData(message)
+		message = '';
+        console.log(conversation)
+    }
 
+    async function fetchData(message: string) {
+        try {
+            let data = {}
+            const response = await fetch(`http://127.0.0.1:8000/get_flight/${encodeURIComponent(message)}`);
+            const responseData = await response.text(); // Assuming the response is in JSON format
+            conversation = [...conversation, {role : "agent", message : responseData}];
+            console.log(responseData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Flask API
+    // onMount(async () => {
+    //     let data = {}
+    //     let message = "Hey there, I wanna book a flight from houston to sydney"
+	// 	const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
+    //     const result = await response.text()
+    //     data = result;
+    //     console.log(result);
+	// });
+    
+    // FastAPI
+    // onMount(async () => {
+	// 	const response = await fetch(`http://127.0.0.1:8000/get_flight/${encodeURIComponent(message)}`);
+    //     const result = await response.json()
+    //     console.log(JSON.stringify(result));
+	// });
 </script>
-
-
-
 
 
 <style lang="postcss">
@@ -119,11 +154,9 @@
     .circular-btn:hover{
         @apply bg-neutral-900;
     }
-  
 
-    .footer{
-        @apply flex flex-row justify-center w-full bg-neutral-700 mx-auto h-full;
-        align-items: center;
+    .message{
+        @apply bg-gray-400; 
     }
    
     .user-input{
@@ -153,12 +186,26 @@
     }
     .renderedResults{
         @apply h-40 w-full overflow-x-auto whitespace-nowrap overflow-y-hidden space-x-4;
+        padding-bottom: 200px;
     }
     .resultCard{
         @apply h-40 w-60 border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl inline-block;
     }
-    .renderedResults ::webkit-scrollbar {
-        @apply appearance-none;
+    ::webkit-scrollbar {
+        @apply bg-black opacity-35;
+        display: none;
+        
+    }
+    /* Custom styling for the scrollbar track */
+    .renderedResults::-webkit-scrollbar-track {
+        @apply bg-black opacity-35;
+        border-radius: 8px;
+    }
+
+    /* Custom styling for the scrollbar handle or thumb */
+    .renderedResults::-webkit-scrollbar-thumb {
+        @apply bg-black opacity-35;
+        border-radius: 8px;
     }
     
 </style>
@@ -200,34 +247,30 @@
             </div>
 
             <div class="chat-box" id="chatBox">
-                <div class="bot-messages">
-                   
+                {#each conversation as { role, message }}
+                    {#if role === 'agent'}
                         <div class="message-wrapper">
-                            <div class="message bot-message">
+                            <div class="message from-bot">
                                 <div class="message-text">{message}</div>
                             </div>
                         </div>
-                   
-                </div>
-            
-                <div class="user-messages">
-                   
+                    {:else if role === 'user'}
                         <div class="message-wrapper">
-                            <div class="message user-message">
+                            <div class="message from-user">
                                 <div class="message-text">{message}</div>
                             </div>
                         </div>
-                  
-                </div>
+                    {/if}
+                {/each}
             </div>
 
         </div>
         
         <div class="bottom">
             <div class="chatInput">
-                <input type="text" id="userInput" class="user-input" placeholder="Type your message here...">
+                <input type="text" id="userInput" bind:value={message} class="user-input" placeholder="Type your message here...">
                 <div class="chatSendBtn">
-                    <button class="send-btn"><span>➤</span></button>
+                    <button  on:click={addToConversation} class="send-btn"><span>➤</span></button>
                 </div>
             </div>
         </div>
