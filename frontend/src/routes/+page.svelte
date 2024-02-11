@@ -65,11 +65,11 @@
         try {
             let data = {}
             const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
-            const responseData = await response.text(); // Assuming the response is in JSON format
+            const responseData = await response.json(); // Assuming the response is in JSON format
 
             //removeLoadingMessage(); // Remove loading message
             
-            conversation = [...conversation, {role : "agent", message : responseData}];
+            conversation = [...conversation, {role : "agent", message : responseData.naturalResponse}];
             console.log(responseData);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -133,7 +133,7 @@
     }
     
     .chat-box {
-        @apply max-h-8 border border-white rounded-2xl p-8 overflow-y-scroll;
+        @apply max-h-full border border-white rounded-2xl p-8 overflow-y-scroll;
     }
 
     .message.from-bot {
