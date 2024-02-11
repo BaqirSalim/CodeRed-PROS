@@ -53,6 +53,9 @@
 
     async function addToConversation(){
         conversation = [...conversation, {role : "user", message : message}];
+
+        //displayLoadingMessage(); // Display loading message
+
         fetchData(message)
 		message = '';
         console.log(conversation)
@@ -61,8 +64,11 @@
     async function fetchData(message: string) {
         try {
             let data = {}
-            const response = await fetch(`http://127.0.0.1:8000/get_flight/${encodeURIComponent(message)}`);
+            const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
             const responseData = await response.text(); // Assuming the response is in JSON format
+
+            //removeLoadingMessage(); // Remove loading message
+            
             conversation = [...conversation, {role : "agent", message : responseData}];
             console.log(responseData);
         } catch (error) {
@@ -70,22 +76,30 @@
         }
     }
 
-    // Flask API
-    // onMount(async () => {
-    //     let data = {}
-    //     let message = "Hey there, I wanna book a flight from houston to sydney"
-	// 	const response = await fetch(`http://127.0.0.1:5000/get_flight/${encodeURIComponent(message)}`);
-    //     const result = await response.text()
-    //     data = result;
-    //     console.log(result);
-	// });
+
     
-    // FastAPI
-    // onMount(async () => {
-	// 	const response = await fetch(`http://127.0.0.1:8000/get_flight/${encodeURIComponent(message)}`);
-    //     const result = await response.json()
-    //     console.log(JSON.stringify(result));
-	// });
+   /* function displayLoadingMessage() {
+        const loadingMessage = document.createElement('div');
+        loadingMessage.textContent = 'Loading...';
+        loadingMessage.classList.add('loading-message');
+        const chatbox = document.querySelector('.conversation');
+        if (chatbox) {
+            chatbox.appendChild(loadingMessage);
+        } else {
+            console.error('.conversation element not found');
+        }
+    }
+
+    function removeLoadingMessage() {
+        const loadingMessage = document.querySelector('.loading-message');
+        if (loadingMessage) {
+            loadingMessage.remove();
+        }
+    }
+*/
+    
+
+
 </script>
 
 
@@ -119,7 +133,7 @@
     }
     
     .chat-box {
-        @apply border border-white rounded-2xl p-8;
+        @apply border border-white rounded-2xl p-8 overflow-y-scroll;
     }
 
     .message.from-bot {
@@ -134,7 +148,7 @@
     .message-wrapper{
         @apply flex mb-8;
     }
-    .message-wrapper:nth-child(2){
+    .message-wrapper:nth-child(n){
         @apply justify-end;
     }
 
@@ -181,33 +195,9 @@
         @apply absolute top-0 left-0 w-full h-full flex flex-col px-10 py-12 pointer-events-auto justify-between;
     }
 
-    .manualToggles{
-        @apply h-10 w-full border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl;
+    .flightInfo{
+        @apply h-full w-4/12 border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl;
     }
-    .renderedResults{
-        @apply h-40 w-full overflow-x-auto whitespace-nowrap overflow-y-hidden space-x-4;
-        padding-bottom: 200px;
-    }
-    .resultCard{
-        @apply h-40 w-60 border border-white rounded-2xl p-8 bg-black opacity-35 backdrop-blur-2xl inline-block;
-    }
-    ::webkit-scrollbar {
-        @apply bg-black opacity-35;
-        display: none;
-        
-    }
-    /* Custom styling for the scrollbar track */
-    .renderedResults::-webkit-scrollbar-track {
-        @apply bg-black opacity-35;
-        border-radius: 8px;
-    }
-
-    /* Custom styling for the scrollbar handle or thumb */
-    .renderedResults::-webkit-scrollbar-thumb {
-        @apply bg-black opacity-35;
-        border-radius: 8px;
-    }
-    
 </style>
 
 <head>
@@ -231,17 +221,8 @@
             <div class="map-wrapper">
                 <div class="map" bind:this={mapContainer}></div>
                 <div class="map-overlay">
-                    <div class="manualToggles">
+                    <div class="flightInfo">
 
-                    </div>
-                    <div class="renderedResults">
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        <div class="resultCard"></div>
-                        
                     </div>
                 </div>
             </div>
@@ -274,5 +255,6 @@
                 </div>
             </div>
         </div>
+        
     </section>
 </section>
