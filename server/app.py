@@ -210,19 +210,19 @@ def convert_to_nlp(obj):  # this will take in an object
 
 
 def fetch_flight_details(obj):  # takes in the converted json
-    # Define client ID and client secret
+    # define client ID and client secret
     CLIENT_ID = "nEJEFKF5JWhWT0Fj6NnGoqGR2duITg8L"
     CLIENT_SECRET = "G3AV2ekuaAvGEVRW"
 
     BASE_URL = "https://test.api.amadeus.com"
 
-    # Construct the endpoint for obtaining access token
+    # construct the endpoint for obtaining access token
     endpoint = "/v1/security/oauth2/token"
 
-    # Construct the URL
+    # construct the URL
     url = BASE_URL + endpoint
 
-    # Define payload with grant_type, client_id, and client_secret
+    # define payload with grant_type, client_id, and client_secret
     payload = {
         "grant_type": "client_credentials",
         "client_id": CLIENT_ID,
@@ -230,35 +230,35 @@ def fetch_flight_details(obj):  # takes in the converted json
     }
 
     try:
-        # Make the POST request to obtain access token
+        # make the POST request to obtain access token
         response = requests.post(url, data=payload)
 
-        # Check if the request was successful (status code 200)
+        # check if the request was successful (status code 200)
         if response.status_code == 200:
-            # Extract access token from the response
+            # extract access token from the response
             access_token = response.json()["access_token"]
             # print("Access Token:", access_token)
         else:
-            # Print error message if request was not successful
+            # print error message if request was not successful
             print("Error:", response.status_code)
             print(response.text)
     except requests.exceptions.RequestException as e:
-        # Print any exceptions that occur during the request
+        # print any exceptions that occur during the request
         print("Error:", e)
 
-    # Construct the authentication header
+    # construct the authentication header
     auth_header = {"Authorization": f"Bearer " + access_token}
 
-    # Define the base URL for the Amadeus API
+    # define the base URL for the Amadeus API
     BASE_URL = "https://test.api.amadeus.com/v2"
 
-    # Construct the endpoint for the flight offer search
+    # construct the endpoint for the flight offer search
     endpoint = "/shopping/flight-offers"
 
-    # Construct the URL
+    # construct the URL
     url = BASE_URL + endpoint
 
-    # Define parameters for the flight offer search
+    # define parameters for the flight offer search
 
     # THESE PARAMETERS WILL NEED TO BE FILLED WITH DATA GIVEN FROM USER NLP
     # params = {
@@ -270,12 +270,12 @@ def fetch_flight_details(obj):  # takes in the converted json
     # }
 
     try:
-        # Make the GET request to the Amadeus API
+        # make the GET request to the Amadeus API
         response = requests.get(url, headers=auth_header, params=obj)
 
-        # Check if the request was successful (status code 200)
+        # check if the request was successful (status code 200)
         if response.status_code == 200:
-            # Print the response data
+            # print the response data
             offers = response.json()["data"]
 
             itineraries = offers[0]["itineraries"]
@@ -289,11 +289,11 @@ def fetch_flight_details(obj):  # takes in the converted json
             }
             return toReturn
         else:
-            # Print error message if request was not successful
+            # print error message if request was not successful
             print("Error:", response.status_code)
             print(response.text)
     except requests.exceptions.RequestException as e:
-        # Print any exceptions that occur during the request
+        # print any exceptions that occur during the request
         print("Error:", e)
 
 
